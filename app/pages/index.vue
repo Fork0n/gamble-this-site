@@ -1,21 +1,40 @@
 <script setup lang="ts">
+import { ref } from 'vue';
+let budget = ref(1000);
+//let suffix = ref('');
 
+const suffix = computed(() => {
+  if (budget.value > 0) {
+    return '';
+  } else if (budget.value < 0 && budget.value > -1000) {
+    return '!';
+  } else if (budget.value <= -1000) {
+    return '!!!';
+  }
+  return '';
+});
+
+function updateBudget(amount: number) {
+  budget.value += amount;
+}
+
+import Placeholder from "~/components/Placeholder.vue";
 </script>
 
 <template>
   <div class="main" id="main">
-    <DynTitle />
+    <DynTitle v-tilt />
     <div class="budget-container" id="budget-container">
-      <h1 class="budget" id="budget">Budget: init-failed!</h1>
+      <h1 class="budget" id="budget">Budget: ${{budget}}{{suffix}}</h1>
     </div>
     <div class="games" id="games">
       <div class="game-cont" id="coinflip-game-cont">
         <Coinflip />
         <div class="btn-cont" id="coinflip-btn-cont">
-          <button class="bet btn" id="coinflip-bet">
+          <button v-tilt class="bet btn" id="coinflip-bet">
             Bet
           </button>
-          <button class="play btn" id="coinflip-play">
+          <button v-tilt class="play btn" id="coinflip-play">
             Roll
           </button>
         </div>
@@ -23,10 +42,10 @@
       <div class="game-cont" id="roulette-game-cont">
         <Roulette />
         <div class="btn-cont" id="roulette-btn-cont">
-          <button class="bet btn" id="roulette-bet">
+          <button v-tilt class="bet btn" id="roulette-bet">
             Bet
           </button>
-          <button class="play btn" id="roulette-play">
+          <button v-tilt class="play btn" id="roulette-play">
             Roll
           </button>
         </div>
@@ -34,10 +53,10 @@
       <div class="game-cont" id="Placeholder-game-cont">
         <Placeholder />
         <div class="btn-cont" id="placeholder-btn-cont">
-          <button class="bet btn" id="Placeholder-bet">
+          <button @click="updateBudget(100)" v-tilt class="bet btn" id="Placeholder-bet">
             Bet
           </button>
-          <button class="play btn" id="Placeholder-play">
+          <button @click="updateBudget(-100)" v-tilt class="play btn" id="Placeholder-play">
             Roll
           </button>
         </div>
@@ -83,6 +102,7 @@
 
 .btn {
   border-radius: 10px;
+  font-family: 'Roboto', sans-serif;
   font-size: 1.2rem;
   font-weight: 600;
   color: white;

@@ -5,6 +5,8 @@ import { ref, computed } from 'vue';
 //vars and stuff and yeah, they work with const because apparently you check the variable.value and not the variable, fine i guess
 const budget = ref(1000);
 const coinflipBet = ref(0);
+const coinflipResult = ref<string>('');
+const coinflipSelection = ref<string>('')
 const rouletteBet = ref(0);
 const placeholderBet = ref(0);
 const rouletteSelection = ref<string>('');
@@ -14,6 +16,9 @@ const showModal = ref(false);
 const activeGame = ref<string | null>(null);
 const modalStep = ref<number>(1);
 
+const showResultModal = ref(false);
+const modalBetSnapshot = ref(0);
+
 //the thing that opens the modal, self explanatory imo
 function openBetModal(game: string) {
   activeGame.value = game;
@@ -21,12 +26,11 @@ function openBetModal(game: string) {
   showModal.value = true;
 }
 
-//again i don't really know what this does but it works so i guess it's fine
+//the thing that define how many modals we need to open before were done
 function saveBet(amount: number) {
   if (activeGame.value === 'coinflip') {
     coinflipBet.value = amount;
-    showModal.value = false;
-    activeGame.value = null;
+    modalStep.value = 2; // Instead of closing, jump to the choice step!
   } else if (activeGame.value === 'roulette') {
     rouletteBet.value = amount;
     modalStep.value = 2;
@@ -35,6 +39,15 @@ function saveBet(amount: number) {
     showModal.value = false;
     activeGame.value = null;
   }
+}
+
+function saveCoinflipChoice(choice: string) {
+  coinflipSelection.value = choice;
+
+  // Clean up and close bet wizard setup
+  showModal.value = false;
+  activeGame.value = null;
+  modalStep.value = 1;
 }
 
 //idk really, must check later
@@ -48,8 +61,9 @@ function saveRouletteChoice(choice: string) {
 
 //Display bets on buttons or stuff
 const coinflipBetDisplay = computed(() => {
-  if (coinflipBet.value === 0) { return 'Bet'}
-  else { return '$' + coinflipBet.value}
+  if (coinflipBet.value === 0) return 'Bet';
+  const choiceText = coinflipSelection.value ? ` (${coinflipSelection.value})` : '';
+  return '$' + coinflipBet.value + choiceText;
 });
 
 const rouletteBetDisplay = computed(() => {
@@ -67,9 +81,9 @@ const placeholderBetDisplay = computed(() => {
 const suffix = computed(() => {
   if (budget.value > 0) {
     return '';
-  } else if (budget.value < 0 && budget.value > -2500) {
+  } else if (budget.value < 0 && budget.value > -5000) {
     return '(!)';
-  } else if (budget.value <= -2500) {
+  } else if (budget.value <= -5000) {
     return '(!!!)';
   }
   return '';
@@ -91,6 +105,25 @@ const flipCoin = (): string => {
   return Math.random() < 0.5 ? "Heads" : "Tails";
 };
 
+//Coinflip function
+function handleCoinflipPlay() {
+  if (coinflipBet.value === 0 || !coinflipSelection.value) {
+    alert("Please place your bet and choose a side first!");
+    return;
+  }
+  const result = flipCoin();
+  coinflipResult.value = result;
+  const userWon = result === coinflipSelection.value;
+  if (userWon) {
+    updateBudget(coinflipBet.value);
+  } else {
+    updateBudget(-coinflipBet.value);
+  }
+  modalBetSnapshot.value = coinflipBet.value;
+  const previousSelection = coinflipSelection.value;
+  showResultModal.value = true;
+}
+
 //Roulete related thing
 const rouletteResult = (): string => {
   const resultNum = Math.floor(Math.random() * 37);
@@ -104,14 +137,6 @@ const selectedResult = computed(() => {
   if (rouletteSelection.value === 'Black') return 'Black';
   return rouletteSelection.value;
 });
-//Coinflip function
-function handleCoinflipPlay() {
-  if (flipCoin() === "Heads") {
-    updateBudget(coinflipBet.value);
-  } else {
-    updateBudget(-coinflipBet.value);
-  }
-}
 
 //Roulete function
 function handleRoulettePlay() {
@@ -139,9 +164,8 @@ function handleRoulettePlay() {
       updateBudget(-rouletteBet.value);
     }
   }
-
-  rouletteBet.value = 0;
   rouletteSelection.value = '';
+  rouletteBet.value = 0;
 }
 
 //Placeholder function
@@ -153,7 +177,7 @@ function handlePlaceholderPlay() {
 
 <template>
   <div class="main" id="main">
-    <DynTitle v-tilt />
+    <DynTitle v-tilting-kickflip />
     <div class="budget-container" id="budget-container">
       <h1 class="budget" id="budget">Budget: ${{budget}}{{suffix}}</h1>
     </div>
@@ -183,10 +207,10 @@ function handlePlaceholderPlay() {
       <div class="game-cont" id="Placeholder-game-cont">
         <Placeholder />
         <div class="btn-cont" id="placeholder-btn-cont">
-          <button @click="openBetModal('placeholder')" v-tilt class="bet btn" id="Placeholder-bet">
+          <button @click="openBetModal('placeholder')" v-tilt class="bet btn" id="placeholder-bet">
             {{ placeholderBetDisplay }}
           </button>
-          <button @click="handlePlaceholderPlay()" v-tilt class="play btn" id="Placeholder-play">
+          <button @click="handlePlaceholderPlay()" v-tilt class="play btn" id="placeholder-play">
             Play
           </button>
         </div>
@@ -195,7 +219,26 @@ function handlePlaceholderPlay() {
 
     <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
       <BetAmountModal v-if="modalStep === 1" @submit-bet="saveBet" />
-      <RouletteBetNrModal v-else-if="modalStep === 2" @select-entry="saveRouletteChoice" />
+
+      <template v-else-if="modalStep === 2">
+        <CoinflipBetHeadsOrTails
+            v-if="activeGame === 'coinflip'"
+            @select-choice="saveCoinflipChoice"
+        />
+        <RouletteBetNrModal
+            v-else-if="activeGame === 'roulette'"
+            @select-entry="saveRouletteChoice"
+        />
+      </template>
+    </div>
+
+    <div v-if="showResultModal" class="modal-overlay" @click.self="showResultModal = false">
+      <CoinflipGameAction
+          :coin-side="coinflipResult"
+          :bet-amount="modalBetSnapshot"
+          :is-win="coinflipResult === coinflipSelection"
+          @close="showResultModal = false; coinflipBet = 0; coinflipSelection = '';"
+      />
     </div>
   </div>
 </template>
@@ -216,7 +259,7 @@ function handlePlaceholderPlay() {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -240,10 +283,10 @@ function handlePlaceholderPlay() {
 }
 
 .bet {
-  background: #FF97D0;
+  background: #B331F1;
 }
 .play {
-  background: #4274D9;
+  background: #9FA1FF;
 }
 
 .btn {

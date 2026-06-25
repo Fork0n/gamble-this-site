@@ -1,10 +1,9 @@
 <script setup lang="ts">
 
-import ArrowRight from "~/components/ArrowRight.vue";
 </script>
 
 <template>
-<ArrowRight />
+
 </template>
 
 <style scoped>

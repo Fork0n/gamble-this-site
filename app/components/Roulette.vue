@@ -17,7 +17,7 @@ function handleWheelSpin() {
 
 <template>
 <div class="roulette-container" id="roulette-container">
-  <img src="/public/roulette/normal/roulette.png" alt="the wheel" class="wheel" id="wheel"></img>
+<!--  <img src="/public/roulette/normal/roulette.png" alt="the wheel" class="wheel" id="wheel"></img>-->
 </div>
 </template>
 

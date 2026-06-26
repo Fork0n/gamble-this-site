@@ -1,6 +1,6 @@
 <script setup lang="ts">
 //importing components
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 
 //vars and stuff and yeah, they work with const because apparently you check the variable.value and not the variable, fine i guess
 const budget = ref(1000);
@@ -18,6 +18,11 @@ const modalStep = ref<number>(1);
 
 const showResultModal = ref(false);
 const modalBetSnapshot = ref(0);
+
+const hotlineNr = ref('fetching hotline nr');
+const country = ref('fetching country');
+
+
 
 //the thing that opens the modal, self explanatory imo
 function openBetModal(game: string) {
@@ -170,8 +175,82 @@ function handleRoulettePlay() {
 
 //Placeholder function
 function handlePlaceholderPlay() {
-  updateBudget(-100)
+  updateBudget(placeholderBet.value);
 };
+
+//END OF GAMBLING RELATED STUFF
+
+//this thing prevents the user from accidentally closing/refreshing the page, by doing so you lose your progress
+//also it's redundant if the budget is 1000 as it's the default value
+const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+  if (budget.value !== 1000) {
+    event.preventDefault();
+    event.returnValue = ''; // Essential for Chrome / modern browsers
+  }
+};
+
+onMounted(() => {
+  window.addEventListener('beforeunload', handleBeforeUnload);
+})
+
+onUnmounted(() => {
+  window.removeEventListener('beforeunload', handleBeforeUnload);
+})
+//end of accident prevention
+
+//this will fetch user's country and pick a relevant hotline nr
+const DEFAULT_PHONE = 'local emergency or health services or https://www.gamblingtherapy.org/';
+const DEFAULT_TEXT = "sorry, your country isn't on the list";
+
+const HotlineMap: Record<string, { name: string; phone: string }> = {
+  US: { name: 'United States', phone: '1-800-GAMBLER' },
+  GB: { name: 'United Kingdom', phone: '0808 8020 133' },
+  CA: { name: 'Canada', phone: '1-866-531-2600' }, // Ontario / National routing
+  AU: { name: 'Australia', phone: '1800 858 858' },
+  NZ: { name: 'New Zealand', phone: '0800 654 655' },
+  IE: { name: 'Ireland', phone: '1800 753 753' },
+  ZA: { name: 'South Africa', phone: '0800 006 008' },
+  DE: { name: 'Germany', phone: '0800 1 372700' },
+  FR: { name: 'France', phone: '09 74 75 13 13' },
+  ES: { name: 'Spain', phone: '900 200 225' },
+  IT: { name: 'Italy', phone: '800 558822' },
+  NL: { name: 'Netherlands', phone: '0800 024 0002' },
+  BE: { name: 'Belgium', phone: '0800 35 777' },
+  AT: { name: 'Austria', phone: '0800 205 242' },
+  CH: { name: 'Switzerland', phone: '0800 801 381' },
+  DK: { name: 'Denmark', phone: '70 11 18 10' },
+  SE: { name: 'Sweden', phone: '020 81 91 00' },
+  NO: { name: 'Norway', phone: '800 800 40' },
+  FI: { name: 'Finland', phone: '0800 100 101' },
+  SG: { name: 'Singapore', phone: '1800 6 668 668' },
+  HK: { name: 'Hong Kong', phone: '1834 633' },
+  BR: { name: 'Brazil', phone: '141' }, // General mental health/support line
+};
+
+onMounted(async () => {
+  try {
+    const response = await fetch('https://ipapi.co/json/');
+    const data = await response.json();
+
+    const countryCode = data.country_code;
+
+    if (countryCode && HotlineMap[countryCode]) {
+      country.value = `if you are from ${HotlineMap[countryCode].name}`;
+      hotlineNr.value = HotlineMap[countryCode].phone;
+    } else if (data.country_name) {
+      // If we know the country name but don't have their specific phone number mapped
+      country.value = `if you are from ${data.country_name}`;
+      hotlineNr.value = DEFAULT_PHONE;
+    } else {
+      country.value = DEFAULT_TEXT;
+      hotlineNr.value = DEFAULT_PHONE;
+    }
+  } catch (error) {
+    console.error('Error fetching country:', error);
+    country.value = DEFAULT_TEXT;
+    hotlineNr.value = DEFAULT_PHONE;
+  }
+})
 
 </script>
 
@@ -216,6 +295,15 @@ function handlePlaceholderPlay() {
         </div>
       </div>
     </div>
+    <div class="disclaimer-container">
+      <p class="disclaimer">
+        *to start from scratch, refresh the page.
+      </p>
+      <p class="disclaimer">
+        *gambling is bad, if you have addiction problems call {{hotlineNr}} ({{country}})
+      </p>
+    </div>
+
 
     <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
       <BetAmountModal v-if="modalStep === 1" @submit-bet="saveBet" />
@@ -309,5 +397,15 @@ function handlePlaceholderPlay() {
   font-size: 2rem;
   font-weight: 600;
   font-family: 'Roboto', sans-serif;
+}
+
+.disclaimer {
+  font-size: 0.8rem;
+  font-weight: 400;
+  font-family: "Roboto Mono", monospace;
+}
+
+.disclaimer-container {
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
 }
 </style>

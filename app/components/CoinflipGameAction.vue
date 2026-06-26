@@ -40,6 +40,9 @@ onMounted(() => {
       <h1 class="data">
         You've {{ status }} {{ amount }}
       </h1>
+      <p class="disclaimer">
+        *the coin might not be accurate your first roll, it will probably correct if you wait a bit
+      </p>
       <button class="continue" @click="emit('close')">
         Continue
       </button>

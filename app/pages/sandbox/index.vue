@@ -4,7 +4,9 @@ import ArrowRight from "~/components/ArrowRight.vue";
 </script>
 
 <template>
-<ArrowRight />
+  <RouletteGameAction />
+
+<!--<ArrowRight />-->
 </template>
 
 <style scoped>

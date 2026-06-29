@@ -4,9 +4,10 @@ import ArrowRight from "~/components/ArrowRight.vue";
 </script>
 
 <template>
-  <RouletteGameAction />
-
-<!--<ArrowRight />-->
+<RouletteGameAction />
+<CoinflipBetHeadsOrTails />
+<BetAmountModal />
+<ArrowRight />
 </template>
 
 <style scoped>

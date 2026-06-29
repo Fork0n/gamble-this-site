@@ -51,13 +51,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.cf-anim-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-}
-cf-anim-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
+
+.cf-anim-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; }
 button { padding: 20px 10px; font-size: 1.1rem; font-weight: bold; border: none; border-radius: 8px; background: #B0BA99; color: #4E220F; cursor: pointer; transition: all 0.2s ease; }
 </style>

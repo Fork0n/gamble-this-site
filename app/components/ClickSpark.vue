@@ -1,7 +1,6 @@
 <template>
   <div ref="containerRef" class="relative w-full h-full" @click="handleClick">
     <canvas ref="canvasRef" class="absolute inset-0 pointer-events-none" />
-
     <slot />
   </div>
 </template>

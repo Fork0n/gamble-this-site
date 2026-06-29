@@ -62,7 +62,6 @@ onMounted(() => {
   handleDecoCoinflip();
 });
 
-// EXPOSE this function so the modal can call it
 defineExpose({
   handleCoinflip
 });
@@ -102,7 +101,7 @@ defineExpose({
 .coin {
   width: 100%;
   height: 100%;
-  user-select: none;
+  //user-select: none;
   -webkit-user-drag: none;
 
   //filter: drop-shadow(0 10px 15px rgba(0,0,0,0.15));

@@ -38,6 +38,10 @@ function handleBet() {
 </template>
 
 <style scoped>
+* {
+  //border: 1px solid red;
+}
+
 .modal-card-container {
   display: flex;
   flex-direction: column;
@@ -57,8 +61,11 @@ function handleBet() {
 
 .title {
   color: white;
-  margin-bottom: 30px;
+  margin-bottom: 60px;
   text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  //font-family: 'Roboto', monospace;
 }
 
 .selection-grid {
@@ -66,7 +73,7 @@ function handleBet() {
   grid-template-columns: repeat(3, 1fr);
   gap: 15px;
   width: 100%;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .chip-button {
@@ -77,30 +84,32 @@ function handleBet() {
   border-radius: 8px;
   background: #B0BA99;
   color: #4E220F;
-  cursor: pointer;
+  transition: all 0.2s ease;
   transition: all 0.2s ease;
 }
 
 .chip-button:hover {
   background: #88BDA4;
-  transform: translateY(-2px);
+  //transform: translateY(-2px);
 }
 
 .chip-button.active {
-  background: #fff;
-  color: #9D6638;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  background: #B1D3B9;
+  //color: #9D6638;
+  //box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .amount-input {
   width: 100%;
   padding: 15px;
   font-size: 1.2rem;
-  border: 2px solid #fff;
+  border: none;
   border-radius: 8px;
   text-align: center;
   outline: none;
   box-sizing: border-box;
+  margin-bottom: 40px;
+  background: #B1D3B9;
 }
 
 .bet-btn {

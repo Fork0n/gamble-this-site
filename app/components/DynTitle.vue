@@ -13,4 +13,8 @@ import { ref } from 'vue';
   width: 780px; height: 300px;
   background: aqua;
 }
+
+.logo {
+  width: 100%; height: 100%;
+}
 </style>

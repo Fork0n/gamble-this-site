@@ -28,11 +28,12 @@ function selectSide(choice: string) {
 
 <style scoped>
 .title {
-  color: #fff;
+  color: white;
+  margin-bottom: 60px;
+  text-align: center;
   font-size: 2rem;
-  margin-bottom: 20px;
   font-weight: bold;
-  font-family: Roboto, sans-serif;
+  //font-family: 'Roboto', monospace;
 }
 .modal-card-container {
   display: flex;
@@ -60,33 +61,23 @@ function selectSide(choice: string) {
   flex-direction: row;
   gap: 10px;
   width: 100%;
-}
-
-.heads {
-  background: #B5BAFF;
-  color: #4E220F;
-}
-
-.tails {
-  background: #D9F9DF;
-  color: #4E220F;
+  padding-bottom: 40px;
 }
 
 .button {
-  padding: 10px 20px;
+  padding: 20px 10px;
+  font-size: 2rem;
+  font-weight: bold;
   border: none;
-  border-radius: 5px;
+  border-radius: 12px;
   cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s ease;
+  transition: all 0.2s ease;
   width: 100%;
+  height: 100px;
+  color: #4E220F;
 }
 
-.title { color: #fff; font-size: 2rem; margin-bottom: 20px; font-weight: bold; font-family: Roboto, sans-serif; }
-.modal-card-container { display: flex; flex-direction: column; align-items: center; justify-content: center; background: #9D6638; width: 600px; padding: 40px; box-sizing: border-box; font-family: sans-serif; border-radius: 22px; border: 2px solid #4E220F; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); flex-shrink: 0; }
-.btn-row { display: flex; flex-direction: row; gap: 10px; width: 100%; }
-.heads { background: #B5BAFF; color: #4E220F; }
-.tails { background: #D9F9DF; color: #4E220F; }
-.button { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; transition: background-color 0.3s ease; width: 100%; }
+.heads { background: #FFD400; }
+.tails { background: #FF0052; }
 
 </style>

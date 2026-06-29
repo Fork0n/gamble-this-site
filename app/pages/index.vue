@@ -11,6 +11,10 @@ const rouletteBet = ref(0);
 const placeholderBet = ref(0);
 const rouletteSelection = ref<string>('');
 
+const rouletteResultString = ref<string>('');
+const rouletteIsWin = ref<boolean>(false);
+const roulettePayoutMultiplier = ref<number>(1);
+
 //modal related stuff
 const showModal = ref(false);
 const activeGame = ref<string | null>(null);
@@ -125,7 +129,9 @@ function handleCoinflipPlay() {
     updateBudget(-coinflipBet.value);
   }
   modalBetSnapshot.value = coinflipBet.value;
-  const previousSelection = coinflipSelection.value;
+
+  // Set the active game back so the modal wrapper knows which component to load
+  activeGame.value = 'coinflip';
   showResultModal.value = true;
 }
 
@@ -145,32 +151,44 @@ const selectedResult = computed(() => {
 
 //Roulete function
 function handleRoulettePlay() {
+  if (rouletteBet.value === 0 || !rouletteSelection.value) {
+    alert("Please place your bet and choose a side first!");
+    return;
+  }
+
   const rolledString = rouletteResult();
   const rolledNum = Number(rolledString);
 
+  rouletteResultString.value = rolledString;
+  modalBetSnapshot.value = rouletteBet.value;
+
   if (selectedResult.value === 'Black') {
-    //Must be even AND cannot be 0
-    if (rolledNum !== 0 && rolledNum % 2 === 0) {
-      updateBudget(rouletteBet.value);
-    } else {
-      updateBudget(-rouletteBet.value);
-    }
+    rouletteIsWin.value = (rolledNum !== 0 && rolledNum % 2 === 0);
+    roulettePayoutMultiplier.value = 1;
   } else if (selectedResult.value === 'Red') {
-    // Must be odd
-    if (rolledNum % 2 === 1) {
-      updateBudget(rouletteBet.value);
-    } else {
-      updateBudget(-rouletteBet.value);
-    }
+    rouletteIsWin.value = (rolledNum % 2 === 1);
+    roulettePayoutMultiplier.value = 1;
   } else {
-    if (rolledString === selectedResult.value) {
-      updateBudget(rouletteBet.value * 35);
-    } else {
-      updateBudget(-rouletteBet.value);
-    }
+    rouletteIsWin.value = (rolledString === selectedResult.value);
+    roulettePayoutMultiplier.value = 35;
   }
-  rouletteSelection.value = '';
+
+  // Set the active game back so the modal wrapper knows which component to load
+  activeGame.value = 'roulette';
+  showResultModal.value = true;
+}
+
+function closeRouletteModal(payload: any) {
+  if (payload.isWin) {
+    updateBudget(payload.betAmount * payload.multiplier);
+  } else {
+    updateBudget(-payload.betAmount);
+  }
+
+  showResultModal.value = false;
   rouletteBet.value = 0;
+  rouletteSelection.value = '';
+  activeGame.value = null;
 }
 
 //Placeholder function
@@ -252,6 +270,10 @@ onMounted(async () => {
   }
 })
 
+function alert(message: string) {
+  globalThis.alert(message);
+}
+
 </script>
 
 <template>
@@ -284,12 +306,12 @@ onMounted(async () => {
         </div>
       </div>
       <div class="game-cont" id="Placeholder-game-cont">
-        <Placeholder />
+        <Placeholder /> <!-- the bet @click is "openBetModal('placeholder')" -->
         <div class="btn-cont" id="placeholder-btn-cont">
-          <button @click="openBetModal('placeholder')" v-tilt class="bet btn" id="placeholder-bet">
+          <button @click="alert('this is still not implemented')" v-tilt class="bet btn" id="placeholder-bet">
             {{ placeholderBetDisplay }}
           </button>
-          <button @click="handlePlaceholderPlay()" v-tilt class="play btn" id="placeholder-play">
+          <button @click="alert('this is still not implemented')" v-tilt class="play btn" id="placeholder-play">
             Play
           </button>
         </div>
@@ -322,10 +344,19 @@ onMounted(async () => {
 
     <div v-if="showResultModal" class="modal-overlay" @click.self="showResultModal = false">
       <CoinflipGameAction
+          v-if="activeGame === 'coinflip'"
           :coin-side="coinflipResult"
           :bet-amount="modalBetSnapshot"
           :is-win="coinflipResult === coinflipSelection"
           @close="showResultModal = false; coinflipBet = 0; coinflipSelection = '';"
+      />
+      <RouletteGameAction
+          v-else-if="activeGame === 'roulette'"
+          :winning-number="rouletteResultString"
+          :bet-amount="modalBetSnapshot"
+          :is-win="rouletteIsWin"
+          :multiplier="roulettePayoutMultiplier"
+          @close="closeRouletteModal"
       />
     </div>
   </div>

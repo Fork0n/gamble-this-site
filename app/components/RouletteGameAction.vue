@@ -76,14 +76,12 @@ onMounted(() => {
   gap: 20px;
 }
 
-/* Handles relative grounding for the arrow element */
 .roulette-modal-visual-box {
   position: relative;
   width: 300px;
   height: 300px;
 }
 
-/* The arrow indicator drawn right here on the modal layer */
 .roulette-modal-visual-box::after {
   content: '';
   position: absolute;

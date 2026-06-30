@@ -39,7 +39,7 @@ function openBetModal(game: string) {
 function saveBet(amount: number) {
   if (activeGame.value === 'coinflip') {
     coinflipBet.value = amount;
-    modalStep.value = 2; // Instead of closing, jump to the choice step!
+    modalStep.value = 2;
   } else if (activeGame.value === 'roulette') {
     rouletteBet.value = amount;
     modalStep.value = 2;
@@ -149,7 +149,7 @@ const selectedResult = computed(() => {
   return rouletteSelection.value;
 });
 
-//Roulete function
+//Roulette function
 function handleRoulettePlay() {
   if (rouletteBet.value === 0 || !rouletteSelection.value) {
     alert("Please place your bet and choose a side first!");
@@ -203,7 +203,7 @@ function handlePlaceholderPlay() {
 const handleBeforeUnload = (event: BeforeUnloadEvent) => {
   if (budget.value !== 1000) {
     event.preventDefault();
-    event.returnValue = ''; // Essential for Chrome / modern browsers
+    event.returnValue = ''; // some browsers need it
   }
 };
 
@@ -217,7 +217,7 @@ onUnmounted(() => {
 //end of accident prevention
 
 //this will fetch user's country and pick a relevant hotline nr
-const DEFAULT_PHONE = 'local emergency or health services or https://www.gamblingtherapy.org/';
+const DEFAULT_PHONE = "local emergency or health services or <a href='https://www.gamblingtherapy.org/' target=\"_blank\" rel=\"noopener\">https://www.gamblingtherapy.org/</a>";
 const DEFAULT_TEXT = "sorry, your country isn't on the list";
 
 const HotlineMap: Record<string, { name: string; phone: string }> = {
@@ -264,7 +264,7 @@ onMounted(async () => {
       hotlineNr.value = DEFAULT_PHONE;
     }
   } catch (error) {
-    console.error('Error fetching country:', error);
+    console.error('Error fetching country: ', error);
     country.value = DEFAULT_TEXT;
     hotlineNr.value = DEFAULT_PHONE;
   }
@@ -306,7 +306,7 @@ function alert(message: string) {
         </div>
       </div>
       <div class="game-cont" id="Placeholder-game-cont">
-        <Placeholder /> <!-- the bet @click is "openBetModal('placeholder')" -->
+        <Placeholder /> <!-- the bet @click is "openBetModal('placeholder')" but it's redundant for release -->
         <div class="btn-cont" id="placeholder-btn-cont">
           <button @click="alert('this is still not implemented')" v-tilt class="bet btn" id="placeholder-bet">
             {{ placeholderBetDisplay }}
@@ -322,7 +322,11 @@ function alert(message: string) {
         *to start from scratch, refresh the page.
       </p>
       <p class="disclaimer">
-        *gambling is bad, if you have addiction problems call {{hotlineNr}} ({{country}})
+        *gambling is bad, if you have addiction problems call <span v-html="hotlineNr"></span> ({{country}})
+      </p>
+      <p class="disclaimer">
+        *if you encounter any bugs, please report them on the github page or dm me on telegram <a href="https://t.me/bavisimo" target="_blank" rel="noopener">@bavisimo</a>; my portfolio:
+        <a href="https://github.com/Fork0n" target="_blank" rel="noopener">Coming Soon</a>
       </p>
     </div>
 

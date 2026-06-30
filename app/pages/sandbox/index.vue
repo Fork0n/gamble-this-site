@@ -1,15 +1,18 @@
 <script setup lang="ts">
 
-import ArrowRight from "~/components/ArrowRight.vue";
 </script>
 
 <template>
-<RouletteGameAction />
-<CoinflipBetHeadsOrTails />
-<BetAmountModal />
+<!--<RouletteGameAction />-->
+<!--<CoinflipBetHeadsOrTails />-->
+<!--<BetAmountModal />-->
 <ArrowRight />
+<ArrowLeft />
 </template>
 
 <style scoped>
-
+html, body {
+  height: 100vh;
+  width: 100vw;
+}
 </style>
